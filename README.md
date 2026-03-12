@@ -3,6 +3,7 @@ PriceAction_Fisica
 O objetivo deste repositorio é trabalharmos com as forças da Fisica e comparar e utilziar em Price Action.
 Exemplo: F=MxA onde Aceleração é a volume, Massa é o movimento do price action o deslocamento do preço resultando em uma Força que será interpretada por cores de candles no grafico.
 Outros conceitos como Velocidade tb serão analsiados alem de outros conceitos que fizerme sentido para o Price Action.
+Oque pode ser compativel com força, massa, aceleração e outros?! usar isso dentro das teorias.
 
 Foco total em WIN B3.
 Operações intraday.
