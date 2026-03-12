@@ -14,6 +14,7 @@ teoria_priceaction.md
 teorias_priceaction_fisica.md
 teoria_backtest.md
 teoria_gerenciamentorisco.md
+teoria_onlineVsatraso.md
 robos
 instrucao_robos.md
 instrucao_backtest.md
