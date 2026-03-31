@@ -1,0 +1,30 @@
+elif candle_color == 'red' and velocity > threshold:
+// priceactionfisica_A1B2C3_60min.ntsl
+// Estratégia baseada em conceitos de física para WIN B3
+
+input
+    risk(2.0), // Risco por operação
+    stop_loss(100), // Stop Loss em pontos
+    parametro_velocidade(14); // Exemplo: média de velocidade
+
+var
+    candle_color, velocity, impulso;
+
+begin
+    // Lógica da estratégia
+    // Força: candle verde ou vermelho
+    // Velocidade: deslocamento rápido
+    // Impulso: rompimento com volume
+
+    // Exemplo de condição de compra
+    if (candle_color = 'green') and (velocity > parametro_velocidade) and (impulso) then
+        buy at market;
+
+    // Exemplo de condição de venda
+    if (candle_color = 'red') and (velocity > parametro_velocidade) and (impulso) then
+        sell at market;
+
+    // Gerenciamento de risco
+    set_stop_loss(stop_loss);
+
+end;

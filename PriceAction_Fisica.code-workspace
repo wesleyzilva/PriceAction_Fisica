@@ -1,0 +1,24 @@
+{
+  "folders": [
+    {
+      "path": "teorias"
+    },
+    {
+      "path": "robos"
+    },
+    {
+      "path": "resultados_backtest"
+    },
+    {
+      "path": "padroes"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "/.git": true,
+      "/.DS_Store": true
+    },
+    "editor.tabSize": 2,
+    "editor.wordWrap": "on"
+  }
+}
