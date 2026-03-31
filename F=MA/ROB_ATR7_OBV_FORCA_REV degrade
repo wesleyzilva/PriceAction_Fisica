@@ -1,0 +1,102 @@
+{
+  Robo: ROB_ATR7_OBV_FORCA_REV
+  Descricao: ATR(7) x OBV; reversao com peso de volume; entradas apenas se Forca >= ForcaMinimaEntrada
+  Versao: 1.0
+}
+
+input
+  VolumeMinimo(800);
+  PeriodoMediaVolume(20);
+  MultVolumeReversao(1.3);
+  ForcaMinimaEntrada(30);     // facilitado para backtest
+  ForcaMinimaReversao(30);
+  HoraFechamento(170000);
+  ATRMultiplicador(2.0);
+
+  fCorpo : float;
+  fRange : float;
+  fMassa : float;
+  fAceleracao : float;
+  fForca : float;
+  fOBV : float;
+
+begin
+  // Cálculo da força pura e degradê visual
+  fCorpo := Close - Open;
+  fRange := High - Low;
+  if fRange <= 0 then fRange := 0.0001;
+
+  if CurrentBar = 1 then
+    fOBV := 0
+  else if Close > Close[1] then
+    fOBV := fOBV[1] + Volume
+  else if Close < Close[1] then
+    fOBV := fOBV[1] - Volume
+  else
+    fOBV := fOBV[1];
+
+  fMassa := fCorpo;
+  fAceleracao := fOBV;
+  fForca := fMassa * fAceleracao / 1000;
+  if fForca > 100 then fForca := 100;
+  if fForca < -100 then fForca := -100;
+
+  // Degradê detalhado: vermelho forte (-100) até verde forte (+100), branco no neutro
+  if fForca >= 95 then PaintBar(RGB(0,100,0));           // Verde muito escuro
+  else if (fForca < 95) and (fForca >= 85) then PaintBar(RGB(0,150,0));      // Verde escuro
+  else if (fForca < 85) and (fForca >= 75) then PaintBar(RGB(0,200,0));      // Verde
+  else if (fForca < 75) and (fForca >= 65) then PaintBar(RGB(34,177,76));    // Verde médio escuro
+  else if (fForca < 65) and (fForca >= 55) then PaintBar(RGB(80,200,120));   // Verde médio
+  else if (fForca < 55) and (fForca >= 45) then PaintBar(RGB(120,255,170));  // Verde claro
+  else if (fForca < 45) and (fForca >= 35) then PaintBar(RGB(153,255,204));  // Verde água
+  else if (fForca < 35) and (fForca >= 25) then PaintBar(RGB(180,255,210));  // Verde muito claro
+  else if (fForca < 25) and (fForca >= 15) then PaintBar(RGB(200,255,220));  // Verde pálido
+  else if (fForca < 15) and (fForca >= 8) then PaintBar(RGB(220,255,240));   // Verde quase branco
+  else if (fForca < 8) and (fForca >= 3) then PaintBar(RGB(240,255,250));    // Verde-neutro
+  else if (fForca < 3) and (fForca > -3) then PaintBar(RGB(255,255,255));    // Neutro (branco)
+  else if (fForca <= -3) and (fForca > -8) then PaintBar(RGB(255,245,245));   // Vermelho-neutro
+  else if (fForca <= -8) and (fForca > -15) then PaintBar(RGB(255,230,230));  // Vermelho quase branco
+  else if (fForca <= -15) and (fForca > -25) then PaintBar(RGB(255,210,210));  // Vermelho pálido
+  else if (fForca <= -25) and (fForca > -35) then PaintBar(RGB(255,180,180));  // Vermelho muito claro
+  else if (fForca <= -35) and (fForca > -45) then PaintBar(RGB(255,140,140));  // Vermelho claro
+  else if (fForca <= -45) and (fForca > -55) then PaintBar(RGB(255,100,100));  // Vermelho médio
+  else if (fForca <= -55) and (fForca > -65) then PaintBar(RGB(255,60,60));    // Vermelho médio escuro
+  else if (fForca <= -65) and (fForca > -75) then PaintBar(RGB(220,0,0));      // Vermelho escuro
+  else if (fForca <= -75) and (fForca > -85) then PaintBar(RGB(180,0,0));      // Vermelho mais escuro
+  else if (fForca <= -85) and (fForca > -95) then PaintBar(RGB(140,0,0));      // Vermelho muito escuro
+  else PaintBar(RGB(100,0,0));                           // Vermelho extremo
+
+  // OBV usado apenas como referência de volume estrutural (não altera fForca aqui)
+  // Sinais de rompimento exigem apenas força mínima (F)
+  bRompCompra := (Close > High[1]) and (fForca >= ForcaMinimaEntrada);
+  bRompVenda  := (Close < Low[1])  and (fForca <= -ForcaMinimaEntrada);
+
+  // Lógica de sinal pendente baseada só em F
+  if bRompCompra and (not IsBought) then bSinalCompraPendente := true;
+  if bRompVenda  and (not IsBought) then bSinalVendaPendente := true;
+
+  // Execução da ordem somente se o candle anterior gerou sinal pendente e F ainda está a favor
+  if bSinalCompraPendente[1] and (fForca > 0) and (not IsBought) then
+  begin
+    BuyAtMarket;
+    bSinalCompraPendente := false;
+  end;
+  if bSinalVendaPendente[1] and (fForca < 0) and (not IsBought) then
+  begin
+    SellShortAtMarket;
+    bSinalVendaPendente := false;
+  end;
+
+  // Limpa sinais pendentes se não confirmados
+  if not bSinalCompraPendente[1] then bSinalCompraPendente := false;
+  if not bSinalVendaPendente[1] then bSinalVendaPendente := false;
+
+  // gerenciamento
+  if IsBought then
+  begin
+    if Low <= Close - (AvgTrueRange(7,0) * 1.5) then ClosePosition;
+    if High >= Close + (AvgTrueRange(7,0) * ATRMultiplicador) then ClosePosition;
+  end;
+
+  if Time() >= HoraFechamento then ClosePosition;
+end

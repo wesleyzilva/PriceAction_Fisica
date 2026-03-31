@@ -1,0 +1,124 @@
+2012_14: 8 csv files
+2012_14 WDOFUT_F_0_30min.csv: read ok latin1, rows 8849
+2012_14 WDOFUT_F_0_60min.csv: read ok latin1, rows 4425
+2012_14 WDOFUT_F_0_Diário.csv: read ok latin1, rows 494
+2012_14 WDOFUT_F_0_Semanal.csv: read ok latin1, rows 104
+2012_14 WINFUT_F_0_30min.csv: read ok latin1, rows 8860
+2012_14 WINFUT_F_0_60min.csv: read ok latin1, rows 4435
+2012_14 WINFUT_F_0_Diário.csv: read ok latin1, rows 494
+2012_14 WINFUT_F_0_Semanal.csv: read ok latin1, rows 104
+2012_14: loaded 27765 rows
+2014_16: 6 csv files
+2014_16 WDOFUT_F_0_60min.csv: read ok latin1, rows 4425
+2014_16 WDOFUT_F_0_Diário.csv: read ok latin1, rows 494
+2014_16 WDOFUT_F_0_Semanal.csv: read ok latin1, rows 104
+2014_16 WINFUT_F_0_60min.csv: read ok latin1, rows 4435
+2014_16 WINFUT_F_0_Diário.csv: read ok latin1, rows 494
+2014_16 WINFUT_F_0_Semanal.csv: read ok latin1, rows 104
+2014_16: loaded 10056 rows
+2016_18: 8 csv files
+2016_18 WDOFUT_F_0_30min.csv: read ok latin1, rows 7624
+2016_18 WDOFUT_F_0_60min.csv: read ok latin1, rows 3888
+2016_18 WDOFUT_F_0_Diário.csv: read ok latin1, rows 495
+2016_18 WDOFUT_F_0_Semanal.csv: read ok latin1, rows 104
+2016_18 WINFUT_F_0_30min.csv: read ok latin1, rows 8646
+2016_18 WINFUT_F_0_60min.csv: read ok latin1, rows 4415
+2016_18 WINFUT_F_0_Diário.csv: read ok latin1, rows 495
+2016_18 WINFUT_F_0_Semanal.csv: read ok latin1, rows 104
+2016_18: loaded 25771 rows
+2018_20: 8 csv files
+2018_20 WDOFUT_F_0_20min.csv: read ok latin1, rows 10000
+2018_20 WDOFUT_F_0_30min.csv: read ok latin1, rows 9022
+2018_20 WDOFUT_F_0_60min.csv: read ok latin1, rows 4593
+2018_20 WDOFUT_F_0_Diário.csv: read ok latin1, rows 493
+2018_20 WINFUT_F_0_20min.csv: read ok latin1, rows 10000
+2018_20 WINFUT_F_0_30min.csv: read ok latin1, rows 9022
+2018_20 WINFUT_F_0_60min.csv: read ok latin1, rows 4593
+2018_20 WINFUT_F_0_Diário.csv: read ok latin1, rows 493
+2018_20: loaded 48216 rows
+2020_22: 12 csv files
+2020_22 WDOFUT_F_0_15min.csv: read ok latin1, rows 10545
+2020_22 WDOFUT_F_0_20min.csv: read ok latin1, rows 13661
+2020_22 WDOFUT_F_0_30min.csv: read ok latin1, rows 9080
+2020_22 WDOFUT_F_0_60min.csv: read ok latin1, rows 4625
+2020_22 WDOFUT_F_0_Diário.csv: read ok latin1, rows 496
+2020_22 WDOFUT_F_0_Semanal.csv: read ok latin1, rows 104
+2020_22 WINFUT_F_0_15min.csv: read ok latin1, rows 10548
+2020_22 WINFUT_F_0_20min.csv: read ok latin1, rows 13663
+2020_22 WINFUT_F_0_30min.csv: read ok latin1, rows 9081
+2020_22 WINFUT_F_0_60min.csv: read ok latin1, rows 4625
+2020_22 WINFUT_F_0_Diário.csv: read ok latin1, rows 496
+2020_22 WINFUT_F_0_Semanal.csv: read ok latin1, rows 104
+2020_22: loaded 77028 rows
+2022_24: 14 csv files
+2022_24 WDOFUT_F_0_10min.csv: read ok latin1, rows 18177
+2022_24 WDOFUT_F_0_15min.csv: read ok latin1, rows 18238
+2022_24 WDOFUT_F_0_20min.csv: read ok latin1, rows 13764
+2022_24 WDOFUT_F_0_30min.csv: read ok latin1, rows 9119
+2022_24 WDOFUT_F_0_60min.csv: read ok latin1, rows 4645
+2022_24 WDOFUT_F_0_Diário.csv: read ok latin1, rows 498
+2022_24 WDOFUT_F_0_Semanal.csv: read ok latin1, rows 104
+2022_24 WINFUT_F_0_10min.csv: read ok latin1, rows 18183
+2022_24 WINFUT_F_0_15min.csv: read ok latin1, rows 18238
+2022_24 WINFUT_F_0_20min.csv: read ok latin1, rows 13764
+2022_24 WINFUT_F_0_30min.csv: read ok latin1, rows 9119
+2022_24 WINFUT_F_0_60min.csv: read ok latin1, rows 4645
+2022_24 WINFUT_F_0_Diário.csv: read ok latin1, rows 498
+2022_24 WINFUT_F_0_Semanal.csv: read ok latin1, rows 104
+2022_24: loaded 129096 rows
+2024_26: 36 csv files
+2024_26 WDOFUT_F_0_10min.csv: read ok latin1, rows 28504
+2024_26 WDOFUT_F_0_15min.csv: read ok latin1, rows 19003
+2024_26 WDOFUT_F_0_1min.csv: read ok latin1, rows 16806
+2024_26 WDOFUT_F_0_20min.csv: read ok latin1, rows 14502
+2024_26 WDOFUT_F_0_30min.csv: read ok latin1, rows 9502
+2024_26 WDOFUT_F_0_5min.csv: read ok latin1, rows 43360
+2024_26 WDOFUT_F_0_60min.csv: read ok latin1, rows 5001
+2024_26 WDOFUT_F_0_Diário.csv: read ok latin1, rows 501
+2024_26 WDOFUT_F_0_Semanal.csv: read ok latin1, rows 105
+2024_26 WDOJ26_F_0_10min.csv: read ok latin1, rows 44
+2024_26 WDOJ26_F_0_15min.csv: read ok latin1, rows 42
+2024_26 WDOJ26_F_0_1min.csv: read ok latin1, rows 64
+2024_26 WDOJ26_F_0_20min.csv: read ok latin1, rows 39
+2024_26 WDOJ26_F_0_30min.csv: read ok latin1, rows 37
+2024_26 WDOJ26_F_0_5min.csv: read ok latin1, rows 49
+2024_26 WDOJ26_F_0_60min.csv: read ok latin1, rows 30
+2024_26 WDOJ26_F_0_Diário.csv: read ok latin1, rows 10
+2024_26 WDOJ26_F_0_Semanal.csv: read ok latin1, rows 5
+2024_26 WINFUT_F_0_10min.csv: read ok latin1, rows 28498
+2024_26 WINFUT_F_0_15min.csv: read ok latin1, rows 19001
+2024_26 WINFUT_F_0_1min.csv: read ok latin1, rows 36540
+2024_26 WINFUT_F_0_20min.csv: read ok latin1, rows 14501
+2024_26 WINFUT_F_0_30min.csv: read ok latin1, rows 9502
+2024_26 WINFUT_F_0_5min.csv: read ok latin1, rows 43421
+2024_26 WINFUT_F_0_60min.csv: read ok latin1, rows 5002
+2024_26 WINFUT_F_0_Diário.csv: read ok latin1, rows 501
+2024_26 WINFUT_F_0_Semanal.csv: read ok latin1, rows 105
+2024_26 WINJ26_F_0_10min.csv: read ok latin1, rows 1709
+2024_26 WINJ26_F_0_15min.csv: read ok latin1, rows 1381
+2024_26 WINJ26_F_0_1min.csv: read ok latin1, rows 5129
+2024_26 WINJ26_F_0_20min.csv: read ok latin1, rows 1184
+2024_26 WINJ26_F_0_30min.csv: read ok latin1, rows 925
+2024_26 WINJ26_F_0_5min.csv: read ok latin1, rows 2424
+2024_26 WINJ26_F_0_60min.csv: read ok latin1, rows 614
+2024_26 WINJ26_F_0_Diário.csv: read ok latin1, rows 90
+2024_26 WINJ26_F_0_Semanal.csv: read ok latin1, rows 20
+2024_26: loaded 308151 rows
+2012_14: cleaned 27765 rows
+2014_16: cleaned 10056 rows
+2016_18: cleaned 25771 rows
+2018_20: cleaned 48216 rows
+2020_22: cleaned 77028 rows
+2022_24: cleaned 129096 rows
+2024_26: cleaned 308151 rows
+consolidated rows 626083
+top 5 ativos por taxa de ganho:
+WINFUT: {'taxa_ganho': np.float64(49.34523865885183), 'amplitude': np.float64(457.9795223351103), 'candles': 316833}
+WDOFUT: {'taxa_ganho': np.float64(47.351533572061975), 'amplitude': np.float64(14.657107749429692), 'candles': 295454}
+WINJ26: {'taxa_ganho': np.float64(27.25586227367171), 'amplitude': np.float64(114.2271445532799), 'candles': 13476}
+WDOJ26: {'taxa_ganho': np.float64(3.4375000000000004), 'amplitude': np.float64(3.5546875), 'candles': 320}
+top 5 ativos por amplitude:
+WINFUT: {'taxa_ganho': np.float64(49.34523865885183), 'amplitude': np.float64(457.9795223351103), 'candles': 316833}
+WINJ26: {'taxa_ganho': np.float64(27.25586227367171), 'amplitude': np.float64(114.2271445532799), 'candles': 13476}
+WDOFUT: {'taxa_ganho': np.float64(47.351533572061975), 'amplitude': np.float64(14.657107749429692), 'candles': 295454}
+WDOJ26: {'taxa_ganho': np.float64(3.4375000000000004), 'amplitude': np.float64(3.5546875), 'candles': 320}

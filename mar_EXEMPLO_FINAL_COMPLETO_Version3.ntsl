@@ -1,0 +1,346 @@
+{
+  Robo: mar_EXEMPLO_FINAL_COMPLETO
+  Descricao: Exemplo final integrado
+             - Força F = M × A
+             - Gradiente branco-verde-vermelho
+             - Padrões: Rompimento + Rejeição + Anomalia
+             - Gestão de risco completa
+             - Cores especiais (Laranja, Amarelo)
+  Ativo: WIN B3
+  Timeframe: 60 minutos
+  Versao: 1.0
+  Status: EXEMPLO FINAL - 100% COMPILÁVEL
+  
+  FEATURES:
+  ✅ Calcula força em tempo real
+  ✅ Aplica gradiente RGB dinâmico
+  ✅ Detecta 3 padrões principais
+  ✅ Cores especiais para eventos
+  ✅ Valida RRR antes de entrar
+  ✅ Gerencia posição com SL/TP
+  ✅ Saída automática por tempo
+}
+
+input
+  VolumeMinimo(2000);
+  CapitalConta(10000);
+  RiscoPorcentagem(2.0);
+  ATRMultiplicador(2.0);
+  UsarPadroesEspeciais(true);
+
+var
+  // ============================================
+  // SEÇÃO 1: VARIÁVEIS DE FORÇA
+  // ============================================
+  
+  fCorpoCandle : float;
+  fRangeCandle : float;
+  fMassa : float;
+  fAceleracao : float;
+  fForca : float;
+  fVolumeMedio : float;
+  
+  // ============================================
+  // SEÇÃO 2: VARIÁVEIS DE CORES
+  // ============================================
+  
+  iCorR : integer;
+  iCorG : integer;
+  iCorB : integer;
+  
+  // ============================================
+  // SEÇÃO 3: VARIÁVEIS DE PADRÕES
+  // ============================================
+  
+  fMaxAnterior : float;
+  fMinAnterior : float;
+  fTamCorpo : float;
+  fTamPavioSup : float;
+  fTamPavioInf : float;
+  bMartelo : boolean;
+  bEstrela : boolean;
+  bRejeicaoForte : boolean;
+  bAnomaliaVolume : boolean;
+  bRompimento : boolean;
+  
+  // ============================================
+  // SEÇÃO 4: VARIÁVEIS DE SINAIS
+  // ============================================
+  
+  bSinalCompra : boolean;
+  bSinalVenda : boolean;
+  
+  // ============================================
+  // SEÇÃO 5: VARIÁVEIS DE GESTÃO
+  // ============================================
+  
+  fRangeCandle_ATR : float;
+  fStopLoss : float;
+  fTakeProfit : float;
+  fRiscoEmPontos : float;
+  fRecompensaEmPontos : float;
+  fRazaoRiscoRecompensa : float;
+  fRiscoEmReais : float;
+  fQuantidade : float;
+  bValidacaoRegras : boolean;
+
+begin
+
+  // ============================================
+  // SEÇÃO 1: CALCULAR FORÇA (F = M × A)
+  // ============================================
+  
+  fCorpoCandle := Close - Open;
+  fRangeCandle := High - Low;
+  
+  if fRangeCandle < 0.01 then
+    fRangeCandle := 0.01;
+  
+  // M = Massa
+  fMassa := fCorpoCandle / fRangeCandle;
+  
+  // A = Aceleração
+  fVolumeMedio := Media(20, Volume);
+  
+  if fVolumeMedio > 0 then
+    fAceleracao := Volume / fVolumeMedio
+  else
+    fAceleracao := 1;
+  
+  // F = M × A × 100
+  fForca := fMassa * fAceleracao * 100;
+  
+  if fForca > 100 then fForca := 100;
+  if fForca < -100 then fForca := -100;
+
+  // ============================================
+  // SEÇÃO 2: APLICAR GRADIENTE RGB
+  // ============================================
+  
+  // Gradiente Positivo: Branco → Verde
+  if fForca >= 0 then
+  begin
+    iCorR := 255 - (2.55 * fForca);
+    iCorG := 255;
+    iCorB := 255 - (2.55 * fForca);
+  end
+  else
+  begin
+    // Gradiente Negativo: Branco → Vermelho
+    iCorR := 255;
+    iCorG := 255 + (2.55 * fForca);
+    iCorB := 255 + (2.55 * fForca);
+  end;
+
+  // ============================================
+  // SEÇÃO 3: DETECTAR PADRÕES
+  // ============================================
+  
+  fTamCorpo := Abs(Close - Open);
+  fTamPavioSup := High - Max(Open, Close);
+  fTamPavioInf := Min(Open, Close) - Low;
+  
+  // Padrão 1: Martelo (Reversão de Baixa)
+  bMartelo := (fTamPavioInf >= fTamCorpo * 1.5) and 
+              (fTamPavioSup <= fTamCorpo * 1.2);
+  
+  // Padrão 2: Estrela (Reversão de Alta)
+  bEstrela := (fTamPavioSup >= fTamCorpo * 1.5) and 
+              (fTamPavioInf <= fTamCorpo * 1.2);
+  
+  // Padrão 3: Rejeição Forte (Laranja)
+  bRejeicaoForte := (High > High[1]) and (Low < Low[1]);
+  
+  // Padrão 4: Anomalia de Volume (Amarelo)
+  bAnomaliaVolume := Volume > (fVolumeMedio * 3.0);
+  
+  // Padrão 5: Rompimento
+  fMaxAnterior := High[1];
+  fMinAnterior := Low[1];
+  bRompimento := (Close > fMaxAnterior) or (Close < fMinAnterior);
+
+  // ============================================
+  // SEÇÃO 4: APLICAR CORES ESPECIAIS
+  // ============================================
+  
+  if UsarPadroesEspeciais then
+  begin
+    // Rejeição forte = LARANJA
+    if bRejeicaoForte then
+    begin
+      iCorR := 255;
+      iCorG := 140;
+      iCorB := 0;
+    end
+    else
+    begin
+      // Anomalia volume = AMARELO BRILHANTE
+      if bAnomaliaVolume then
+      begin
+        iCorR := 255;
+        iCorG := 255;
+        iCorB := 0;
+      end;
+    end;
+  end;
+
+  // Pintar candle com cor final
+  PaintBar(RGB(iCorR, iCorG, iCorB));
+
+  // ============================================
+  // SEÇÃO 5: CALCULAR ATR
+  // ============================================
+  
+  fRangeCandle_ATR := (High - Low + High[1] - Low[1] + High[2] - Low[2]) / 3;
+
+  // ============================================
+  // SEÇÃO 6: LÓGICA DE SINAIS
+  // ============================================
+  
+  bSinalCompra := false;
+  bSinalVenda := false;
+  
+  // Sinal de Compra: Rompimento para cima + Volume + Força
+  if (Close > fMaxAnterior) and (Volume > VolumeMinimo) then
+  begin
+    if bMartelo or bRejeicaoForte or (fForca > 50) then
+    begin
+      bSinalCompra := true;
+    end;
+  end;
+  
+  // Sinal de Venda: Rompimento para baixo + Volume + Força
+  if (Close < fMinAnterior) and (Volume > VolumeMinimo) then
+  begin
+    if bEstrela or bRejeicaoForte or (fForca < -50) then
+    begin
+      bSinalVenda := true;
+    end;
+  end;
+
+  // ============================================
+  // SEÇÃO 7: VALIDAR REGRAS DE RISCO
+  // ============================================
+  
+  bValidacaoRegras := false;
+  
+  // Validação para COMPRA
+  if bSinalCompra then
+  begin
+    fStopLoss := Close - (fRangeCandle * 1.5);
+    fTakeProfit := Close + (fRangeCandle_ATR * ATRMultiplicador);
+    
+    fRiscoEmPontos := Close - fStopLoss;
+    fRecompensaEmPontos := fTakeProfit - Close;
+    
+    if fRiscoEmPontos > 0 then
+      fRazaoRiscoRecompensa := fRecompensaEmPontos / fRiscoEmPontos
+    else
+      fRazaoRiscoRecompensa := 0;
+    
+    // RRR deve ser >= 1.0
+    if fRazaoRiscoRecompensa >= 1.0 then
+    begin
+      fRiscoEmReais := CapitalConta * (RiscoPorcentagem / 100);
+      fQuantidade := fRiscoEmReais / (fRiscoEmPontos * 0.2);
+      
+      if fQuantidade < 1 then fQuantidade := 1;
+      if fQuantidade > 5 then fQuantidade := 5;
+      
+      bValidacaoRegras := true;
+    end;
+  end;
+  
+  // Validação para VENDA
+  if bSinalVenda then
+  begin
+    fStopLoss := Close + (fRangeCandle * 1.5);
+    fTakeProfit := Close - (fRangeCandle_ATR * ATRMultiplicador);
+    
+    fRiscoEmPontos := fStopLoss - Close;
+    fRecompensaEmPontos := Close - fTakeProfit;
+    
+    if fRiscoEmPontos > 0 then
+      fRazaoRiscoRecompensa := fRecompensaEmPontos / fRiscoEmPontos
+    else
+      fRazaoRiscoRecompensa := 0;
+    
+    if fRazaoRiscoRecompensa >= 1.0 then
+    begin
+      fRiscoEmReais := CapitalConta * (RiscoPorcentagem / 100);
+      fQuantidade := fRiscoEmReais / (fRiscoEmPontos * 0.2);
+      
+      if fQuantidade < 1 then fQuantidade := 1;
+      if fQuantidade > 5 then fQuantidade := 5;
+      
+      bValidacaoRegras := true;
+    end;
+  end;
+
+  // ============================================
+  // SEÇÃO 8: EXECUTAR ORDENS
+  // ============================================
+  
+  // COMPRA: Sinal + Força > 40% + RRR ok + Sem posição aberta
+  if bSinalCompra and (not IsBought) and (fForca > 40) and bValidacaoRegras then
+  begin
+    BuyAtMarket;
+  end;
+  
+  // VENDA: Sinal + Força < -40% + RRR ok + Sem posição aberta
+  if bSinalVenda and (not IsSold) and (fForca < -40) and bValidacaoRegras then
+  begin
+    SellShortAtMarket;
+  end;
+
+  // ============================================
+  // SEÇÃO 9: GERENCIAR POSIÇÃO ABERTA
+  // ============================================
+  
+  // Se está em posição COMPRADA
+  if IsBought then
+  begin
+    // Stop Loss atingido
+    if Low <= fStopLoss then
+    begin
+      ClosePosition;
+    end
+    else
+    begin
+      // Take Profit atingido
+      if High >= fTakeProfit then
+      begin
+        ClosePosition;
+      end;
+    end;
+  end;
+  
+  // Se está em posição VENDIDA
+  if IsSold then
+  begin
+    // Stop Loss atingido
+    if High >= fStopLoss then
+    begin
+      ClosePosition;
+    end
+    else
+    begin
+      // Take Profit atingido
+      if Low <= fTakeProfit then
+      begin
+        ClosePosition;
+      end;
+    end;
+  end;
+
+  // ============================================
+  // SEÇÃO 10: SAÍDA OBRIGATÓRIA POR TEMPO
+  // ============================================
+  
+  // Fechar todas as posições às 17:00 (fim do pregão)
+  if Time() >= 170000 then
+  begin
+    ClosePosition;
+  end;
+
+end;

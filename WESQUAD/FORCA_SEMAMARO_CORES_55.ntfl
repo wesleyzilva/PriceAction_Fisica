@@ -1,0 +1,85 @@
+{ 
+  Robo: FORCA_SEMAFORO_CORES_55
+  Descricao: Coloração baseada em Forca > 55% para 60min, 30min e 15min
+  Versao: 4.0
+}
+
+input
+  VolumeMinimo(2000);
+  PeriodoMediaVolume(20);
+  ForcaMinimaEntrada(55); // O gatilho que você pediu
+  ATR_Mult_Stop(1.5);     // Multiplicador para o Stop Loss
+  ForcaExaustao(10);      // Sair quando a força cair abaixo disso
+  HoraFechamento(170000);
+
+var
+  fCorpo, fRange, fVolMedia, fMassa, fAceleracao, fForca, fATR : float;
+
+begin
+  // --- Cálculos de Base ---
+  fCorpo := Close - Open;
+  fRange := High - Low;
+  if fRange <= 0 then fRange := 0.0001;
+
+  fVolMedia := Media(PeriodoMediaVolume, Volume);
+  if fVolMedia <= 0 then fVolMedia := 1;
+
+  fATR := AvgTrueRange(PeriodoMediaVolume, 0);
+
+  // --- Cálculo da Força ---
+  fMassa := fCorpo / fRange;
+  fAceleracao := Volume / fVolMedia;
+  fForca := fMassa * fAceleracao * 100;
+  
+  // Limites de segurança
+  if fForca > 100 then fForca := 100;
+  if fForca < -100 then fForca := -100;
+
+  // --- LÓGICA DE CORES (O QUE VOCÊ VAI VER NAS TELAS) ---
+  // Só pinta se a força for maior ou igual a 55%
+  if (fForca >= ForcaMinimaEntrada) entao
+  begin
+    PaintBar(clVerde); // Pintar o candle de Verde (Compra Forte)
+  end
+  senao se (fForca <= -ForcaMinimaEntrada) entao
+  begin
+    PaintBar(clVermelho); // Pintar o candle de Vermelho (Venda Forte)
+  end
+  senao
+  begin
+    PaintBar(clCinza); // Pintar de Cinza se a força for fraca (abaixo de 55%)
+  end;
+
+  // --- SINAIS PARA O GERENCIADOR DE ALARMES ---
+  // Usamos as funções de sinal para o Profit "gritar" no som
+  // Entradas protegidas com alerta sonoro apenas para Compra ou Venda
+  if (not HasPosition) entao
+  begin
+    if (fForca >= ForcaMinimaEntrada) entao
+    begin
+      BuyAtMarket;
+      Alert(clVerde); // Sinal sonoro apenas para Compra
+    end;
+
+    if (fForca <= -ForcaMinimaEntrada) entao
+    begin
+      SellShortAtMarket;
+      Alert(clVermelho); // Sinal sonoro apenas para Venda
+    end;
+  end;
+
+  // --- GERENCIAMENTO DE SAÍDA (Onde a ordem é mantida) ---
+  if IsBought entao
+  begin
+    // Sai se a força inverter (venda forte), se a força cansar (< 10) ou Stop ATR
+    if (fForca <= -ForcaMinimaEntrada) ou (fForca < ForcaExaustao) ou (Low <= BuyPrice - (fATR * ATR_Mult_Stop)) entao ClosePosition;
+  end
+  senao se IsSold entao
+  begin
+    // Sai se a força inverter (compra forte), se a força cansar (> -10) ou Stop ATR
+    if (fForca >= ForcaMinimaEntrada) ou (fForca > -ForcaExaustao) ou (High >= SellPrice + (fATR * ATR_Mult_Stop)) entao ClosePosition;
+  end;
+
+  // Fechamento por horário
+  if Time() >= HoraFechamento then ClosePosition;
+end;

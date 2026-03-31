@@ -1,0 +1,79 @@
+{
+  Robo: ROB_ATR21_OBV_FORCA_REV
+  Descricao: ATR(21) x OBV; reversao com peso de volume; entradas apenas se Forca >= ForcaMinimaEntrada
+  Versao: 1.0
+}
+
+input
+  VolumeMinimo(2000);
+  PeriodoMediaVolume(20);
+  MultVolumeReversao(2.0);
+  ForcaMinimaEntrada(60);
+  ForcaMinimaReversao(30);
+  HoraFechamento(170000);
+  ATRMultiplicador(2.0);
+
+var
+  fCorpo, fRange, fVolMedia, fMassa, fAceleracao, fForca : float;
+  bRejeicao, bReversaoConfirmada, bRompCompra, bRompVenda : boolean;
+
+begin
+  fCorpo := Close - Open;
+  fRange := High - Low;
+  if fRange <= 0 then fRange := 0.0001;
+
+  fVolMedia := Media(PeriodoMediaVolume, Volume);
+  if fVolMedia <= 0 then fVolMedia := 1;
+
+  fMassa := fCorpo / fRange;
+  fAceleracao := Volume / fVolMedia;
+  fForca := fMassa * fAceleracao * 100;
+  if fForca > 100 then fForca := 100;
+  if fForca < -100 then fForca := -100;
+
+  bRejeicao := (High > High[1]) and (Low < Low[1]);
+  bReversaoConfirmada := false;
+  if bRejeicao then
+  begin
+    if (Volume >= VolumeMinimo) and (Volume >= fVolMedia * MultVolumeReversao) then
+      bReversaoConfirmada := true;
+  end;
+
+  if bReversaoConfirmada then
+    PaintBar(RGB(255,140,0))
+  else
+  begin
+    if fForca > 80 then PaintBar(RGB(0,255,0))
+    else if fForca > 60 then PaintBar(RGB(51,255,51))
+    else if fForca > 40 then PaintBar(RGB(102,255,102))
+    else if fForca > 20 then PaintBar(RGB(153,255,153))
+    else if (fForca >= -15) and (fForca <= 15) then PaintBar(RGB(255,255,255))
+    else if fForca < -80 then PaintBar(RGB(255,0,0))
+    else if fForca < -60 then PaintBar(RGB(255,51,51))
+    else if fForca < -40 then PaintBar(RGB(255,102,102))
+    else if fForca < -20 then PaintBar(RGB(255,153,153))
+    else PaintBar(RGB(128,128,128));
+  end;
+
+  bRompCompra := (Close > High[1]) and (Volume > VolumeMinimo) and (fForca >= ForcaMinimaEntrada);
+  bRompVenda  := (Close < Low[1])  and (Volume > VolumeMinimo) and (fForca <= -ForcaMinimaEntrada);
+
+  if bReversaoConfirmada then
+  begin
+    if (Close > High[1]) and (fForca >= ForcaMinimaEntrada) and (not IsBought) then BuyAtMarket;
+    if (Close < Low[1]) and (fForca <= -ForcaMinimaEntrada) and (not IsBought) then SellShortAtMarket;
+  end
+  else
+  begin
+    if bRompCompra and (not IsBought) then BuyAtMarket;
+    if bRompVenda  and (not IsBought) then SellShortAtMarket;
+  end;
+
+  if IsBought then
+  begin
+    if Low <= Close - (AvgTrueRange(21,0) * 1.5) then ClosePosition;
+    if High >= Close + (AvgTrueRange(21,0) * ATRMultiplicador) then ClosePosition;
+  end;
+
+  if Time() >= HoraFechamento then ClosePosition;
+end

@@ -1,0 +1,42 @@
+WESQUAD
+Formas retangulares para identificação de zonas de compra e zonas de venda dentro do Mini Indice
+Com takes de até 150 pts e com SL menor possível.
+
+Meu modelo se baseia na seguinte análise:
+Semáforo de cores em timeframes 60, 30, 15 na qual nem olho 
+se não tiver o mesmo sinal de venda (vermelho) ou compra(verde)
+em pelo menos 2 dos 3 timeframes indicando que é um sinal de alerta de possivel operação proxima.
+se tiver apenas um é sinal de não operação. 
+
+Se estiver habilitada a operação com 3 timeframes então:
+1- Timeframe: 15 min (3 ultimos candles)
+    Neles marco um retangulo de compra acima e abaixo do fechamento de 200pts para os proximos 15 min.
+    O objetivo deste retangulo é determinar uma área de venda ou de compra.
+    Para área de venda uso Laranja e para área de compra uso Ciano.
+    SEMPRE preciso de um candle de 15 min não esticado para maior assertividade, pois, trabalhamos com seus extremos.
+
+2- Timeframe: 5 min (até os 5 últimos candles)
+    Neles marco um retangulo de compra acima e abaixo do fechamento de 200pts para os proximos 5 min.
+        A marcação deve ser apenas para o candle com volume significativo indicado pelo indicador F=MA desenvolvido.
+    O objetivo deste retangulo é determinar uma área de venda ou de compra.
+    Para área de venda uso Vermelho e para área de compra faço de compra uso Verde lima.
+
+3- Timeframe: 2 min
+    Se o preço romper a área de 2 retangulos podemos entrar em operação no sentido da operação
+    A cada rompimento tenho mais certeza de da operação e tento achar o SG.
+    podemos usar a MME9 ou MME20 para sinais de entrada (por exemplo).
+
+    Áreas de gatilho em 2 min ou 5 min: 2 candles que tem quase a mesma cor (OS MAIS PROXIMOS)
+    Fucsia: venda
+    Verde Lima: compra
+
+Importante sempre:
+Se o preço rompeu ou devolver todos os timeframes a analise recomeça (esticado) á partir daquele candle matador.
+Se o preço ele entrar na zona de venda de 15 min a operação o risco de SL aumenta.
+O Volume Profile pode mostrar alvos de SG em colunas que se tornam bem evidêntes.
+Área de venda e área de compra não podem encostar, pois, é o espaço que o preço de venda precisa para se movimentar.
+Cuidado com IFS de sobrecompra e sobrevenda e sinais de reversão com volume consideravel.
+Sempre reajustar MME20 para timeframes 5, 15, 30, 60.
+
+Anotações importantes: 
+Se F=MA ficar COM COR SIGNIFICANTE algumas vezes significa que a direção esta correta do take e o SL deve ser pequeno.

@@ -1,0 +1,94 @@
+o objetivo é criar robos de execução de trade utilizando as variações possiveis deste formula: F é o resultado em cor de candle. M é ATR, e A é o volume que posso usar OBV, VWAP ou Volume Moving Avarage mm21 e fazer backtest com eles quantas combinações são possiveis?
+
+9 Combinações Possíveis:
+#	M (ATR)	A (Volume)	Fórmula	Foco	Risco
+1	ATR(7)	OBV	F = ATR(7) × OBV	Muito rápido	Muito Alto
+2	ATR(7)	VWAP	F = ATR(7) × VWAP	Muito rápido	Muito Alto
+3	ATR(7)	Vol MA21	F = ATR(7) × Vol MA21	Muito rápido	Alto
+4	ATR(14)	OBV	F = ATR(14) × OBV	Equilibrado	Médio
+5	ATR(14)	VWAP	F = ATR(14) × VWAP	Equilibrado	Médio
+6	ATR(14)	Vol MA21	F = ATR(14) × Vol MA21	Equilibrado	Médio
+7	ATR(21)	OBV	F = ATR(21) × OBV	Mais lento	Mais baixo
+8	ATR(21)	VWAP	F = ATR(21) × VWAP	Mais lento	Mais baixo
+9	ATR(21)	Vol MA21	F = ATR(21) × Vol MA21	Mais lento	Mais baixo
+
+Sintaxe ntfl 
+RESUMO DAS CORREÇÕES:
+Erro	Correção
+ATR(21)	AvgTrueRange(21, 0) (com 2 parâmetros)
+OnBalanceVolume()	OBV() (sem parâmetros)
+Volume	Volume() (função)
+FloatToInt()	Arred() (arredondar)
+EstahComprado	PosicaoAberta (booleana)
+BuyAtMarket	ComprarAsMercado
+SellShortAtMarket	VenderAsMercado
+ClosePosition	FecharPosicao
+
+// INDICADORES - SINTAXE CORRETA COM 2 PARÂMETROS
+
+AvgTrueRange(periodo, tipoMedia)        // ATR com 2 parâmetros
+// periodo = 14, 21, 7
+// tipoMedia = 0 (simples), 1 (exponencial)
+
+OBV()                                    // OBV sem parâmetros - retorna valor único
+
+Volume()                                 // Volume ATUAL (função, não variável)
+Volume(1)                               // Volume DA BARRA ANTERIOR
+
+Media(periodo, valor)                    // Média móvel
+VWAP()                                  // VWAP sem parâmetros
+
+// VARIÁVEIS PREDEFINIDAS (SEM parênteses)
+Close                                   // Fechamento
+Close[1]                                // Fechamento anterior
+Open
+High
+Low
+Vol                                     // Volume (propriedade, não função)
+
+// POSIÇÃO
+ComprarAsMercado                        // Compra
+VenderAsMercado                         // Venda
+FecharPosicao                           // Fecha
+PosicaoAberta                           // Booleana (true/false)
+
+// CONVERSÃO
+Arred(valor)                            // Arredonda
+Trunc(valor)                            // Trunca
+Abs(valor)                              // Valor absoluto
+
+
+exemplo compilavel:
+begin
+// ATR(21) x Volume MA(21) - bloco mínimo compilável
+
+// Condição de entrada (força normalizada > 50) e filtro de candle/volume
+if (Media(21, Volume) > 0) then
+begin
+  if ((AvgTrueRange(21,0) / Close) * (Volume / Media(21, Volume)) * 100 > 50)
+     and (not IsBought)
+     and (Close > High[1])
+     and (Volume > 2000 * 2) then
+    BuyAtMarket;
+
+  if ((AvgTrueRange(21,0) / Close) * (Volume / Media(21, Volume)) * 100 < -50)
+     and (not IsBought)
+     and (Close < Low[1])
+     and (Volume > 2000 * 2) then
+    SellShortAtMarket;
+end;
+
+// Gerenciamento de posição (stop loss e take profit usando ATR recalculado)
+if IsBought then
+begin
+  if Low <= Close - (AvgTrueRange(21,0) * 1.5) then
+    ClosePosition;
+  if High >= Close + (AvgTrueRange(21,0) * 2.0) then
+    ClosePosition;
+end;
+
+// Saída por horário (formato HHMMSS)
+if Time() >= 170000 then
+  ClosePosition;
+
+end

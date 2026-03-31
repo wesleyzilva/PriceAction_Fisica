@@ -1,0 +1,59 @@
+// Script ProfitChart: Degradê de força pelo volume ponderado pelo corpo
+// Pinta o candle conforme a aceleração A = Volume * |Close - Open| / (High - Low)
+
+input
+  PeriodoMediaVolume(20);
+
+var
+  fCorpo : float;
+  fRange : float;
+  fAceleracao : float;
+  fForca : float;
+  fVolMedia : float;
+
+begin
+  fCorpo := abs(Close - Open);
+  fRange := High - Low;
+  if fRange <= 0 then fRange := 0.0001;
+
+  fAceleracao := Volume * (fCorpo / fRange);
+  fVolMedia := Media(PeriodoMediaVolume, Volume);
+  if fVolMedia = 0 then fVolMedia := 1;
+  // Normaliza para facilitar o degradê
+  fForca := fAceleracao / fVolMedia * 30; // escala mais sensível para expandir o degradê
+  if fForca > 100 then fForca := 100;
+  if fForca < -100 then fForca := -100;
+
+  // Degradê detalhado: vermelho forte (-100) até verde forte (+100), branco no neutro
+  if fForca >= 95 then PaintBar(RGB(0,100,0));           // Verde muito escuro
+  if (fForca < 95) and (fForca >= 85) then PaintBar(RGB(0,150,0));      // Verde escuro
+  if (fForca < 85) and (fForca >= 75) then PaintBar(RGB(0,200,0));      // Verde
+  if (fForca < 75) and (fForca >= 65) then PaintBar(RGB(34,177,76));    // Verde médio escuro
+  if (fForca < 65) and (fForca >= 55) then PaintBar(RGB(80,200,120));   // Verde médio
+  if (fForca < 55) and (fForca >= 45) then PaintBar(RGB(120,255,170));  // Verde claro
+  if (fForca < 45) and (fForca >= 35) then PaintBar(RGB(153,255,204));  // Verde água
+  if (fForca < 35) and (fForca >= 25) then PaintBar(RGB(180,255,210));  // Verde muito claro
+  if (fForca < 25) and (fForca >= 15) then PaintBar(RGB(200,255,220));  // Verde pálido
+  if (fForca < 15) and (fForca >= 8) then PaintBar(RGB(220,255,240));   // Verde quase branco
+  if (fForca < 8) and (fForca >= 3) then PaintBar(RGB(240,255,250));    // Verde-neutro
+  if (fForca < 3) and (fForca > -3) then PaintBar(RGB(255,255,255));    // Neutro (branco)
+  if (fForca <= -3) and (fForca > -8) then PaintBar(RGB(255,245,245));   // Vermelho-neutro
+  if (fForca <= -8) and (fForca > -15) then PaintBar(RGB(255,230,230));  // Vermelho quase branco
+  if (fForca <= -15) and (fForca > -25) then PaintBar(RGB(255,210,210));  // Vermelho pálido
+  if (fForca <= -25) and (fForca > -35) then PaintBar(RGB(255,180,180));  // Vermelho muito claro
+  if (fForca <= -35) and (fForca > -45) then PaintBar(RGB(255,140,140));  // Vermelho claro
+  if (fForca <= -45) and (fForca > -55) then PaintBar(RGB(255,100,100));  // Vermelho médio
+  if (fForca <= -55) and (fForca > -65) then PaintBar(RGB(255,60,60));    // Vermelho médio escuro
+  if (fForca <= -65) and (fForca > -75) then PaintBar(RGB(220,0,0));      // Vermelho escuro
+  if (fForca <= -75) and (fForca > -85) then PaintBar(RGB(180,0,0));      // Vermelho mais escuro
+  if (fForca <= -85) and (fForca > -95) then PaintBar(RGB(140,0,0));      // Vermelho muito escuro
+  if fForca <= -95 then PaintBar(RGB(100,0,0));                           // Vermelho extremo
+
+  // Lógica simples de operação para teste de backtest
+  if (fForca > 20) and (not IsBought) then BuyAtMarket;
+  if (fForca < -20) and (not IsBought) then SellShortAtMarket;
+  if IsBought then
+  begin
+    if (fForca < 5) then ClosePosition;
+  end;
+end

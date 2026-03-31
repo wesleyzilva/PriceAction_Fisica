@@ -1,0 +1,133 @@
+{
+  Robo: ROB_ATR7_OBV_FORCA_REV
+  Descricao: ATR(7) x OBV; reversao com peso de volume; entradas apenas se Forca >= ForcaMinimaEntrada
+  Versao: 1.0
+}
+
+input
+  VolumeMinimo(2000);
+  PeriodoMediaVolume(20);
+  MultVolumeReversao(2.0);
+  ForcaMinimaEntrada(60);     // ajuste para 60 ou 80
+  ForcaMinimaReversao(30);
+  HoraFechamento(170000);
+  ATRMultiplicador(2.0);
+  MaximoStopPontos(150);      // Limite do WESQUAD para SL curto
+
+var
+  fCorpo : float;
+  fRange : float;
+  fVolMedia : float;
+  fMassa : float;
+  fAceleracao : float;
+  fForca : float;
+  bRejeicao : boolean;
+  bReversaoConfirmada : boolean;
+  bRompCompra : boolean;
+  bRompVenda : boolean;
+  bSinalCompraPendente : boolean;
+  bSinalVendaPendente : boolean;
+  fPrecoStop : float;
+  fTamanhoStop : float;
+  bStopCurto : boolean;
+
+begin
+  // cálculos
+  fCorpo := Close - Open;
+  fRange := High - Low;
+  if fRange <= 0 then fRange := 0.0001;
+
+  fVolMedia := Media(PeriodoMediaVolume, Volume);
+  if fVolMedia <= 0 then fVolMedia := 1;
+
+  // Força: M = corpo/range ; A = Volume / VolMedia (usando Volume real)
+  fMassa := fCorpo / fRange;
+  fAceleracao := Volume / fVolMedia;
+  fForca := fMassa * fAceleracao * 100;
+  if fForca > 100 then fForca := 100;
+  if fForca < -100 then fForca := -100;
+
+  // detectar rejeição estrutural
+  bRejeicao := (High > High[1]) and (Low < Low[1]);
+
+  // confirmar reversão por volume (absoluto + relativo)
+  bReversaoConfirmada := false;
+  if bRejeicao then
+  begin
+    if (Volume >= VolumeMinimo) and (Volume >= fVolMedia * MultVolumeReversao) then
+      bReversaoConfirmada := true;
+  end;
+
+  // pintar: LARANJA se reversão confirmada, senão gradiente por fForca
+  if bReversaoConfirmada then
+    PaintBar(RGB(255,140,0))
+  else
+  begin
+    if fForca > 80 then PaintBar(RGB(0,255,0))
+    else if fForca > 60 then PaintBar(RGB(51,255,51))
+    else if fForca > 40 then PaintBar(RGB(102,255,102))
+    else if fForca > 20 then PaintBar(RGB(153,255,153))
+    else if (fForca >= -15) and (fForca <= 15) then PaintBar(RGB(255,255,255))
+    else if fForca < -80 then PaintBar(RGB(255,0,0))
+    else if fForca < -60 then PaintBar(RGB(255,51,51))
+    else if fForca < -40 then PaintBar(RGB(255,102,102))
+    else if fForca < -20 then PaintBar(RGB(255,153,153))
+    else PaintBar(RGB(128,128,128));
+  end;
+
+  // OBV usado apenas como referência de volume estrutural (não altera fForca aqui)
+  // sinais de rompimento exigem força mínima
+  bRompCompra := (Close > High[1]) and (fForca >= ForcaMinimaEntrada);
+  bRompVenda  := (Close < Low[1])  and (fForca <= -ForcaMinimaEntrada);
+
+  // Cálculo de Stop Estrutural (Mínima do candle anterior ou sinal)
+  // Isso garante o "menor SL possível" baseado no Price Action puro
+  if bRompCompra or (bReversaoConfirmada and (Close > High[1])) then
+    fTamanhoStop := Close - Low[1]
+  else if bRompVenda or (bReversaoConfirmada and (Close < Low[1])) then
+    fTamanhoStop := High[1] - Close;
+
+  bStopCurto := fTamanhoStop <= MaximoStopPontos;
+
+  // Lógica de sinal pendente
+  if bReversaoConfirmada and bStopCurto then
+  begin
+    if (Close > High[1]) and (fForca >= ForcaMinimaEntrada) and (not IsBought) then
+      bSinalCompraPendente := true;
+    if (Close < Low[1]) and (fForca <= -ForcaMinimaEntrada) and (not IsBought) then
+      bSinalVendaPendente := true;
+  end
+  else if bStopCurto then
+  begin
+    if bRompCompra and (not IsBought) then bSinalCompraPendente := true;
+    if bRompVenda  and (not IsBought) then bSinalVendaPendente := true;
+  end;
+
+  // Execução da ordem somente se o candle anterior gerou sinal pendente e o volume atual está a favor
+  if bSinalCompraPendente[1] and (Volume > VolumeMinimo) and (fForca > 0) and (not IsBought) then
+  begin
+    BuyAtMarket;
+    bSinalCompraPendente := false;
+  end;
+  if bSinalVendaPendente[1] and (Volume > VolumeMinimo) and (fForca < 0) and (not IsBought) then
+  begin
+    SellShortAtMarket;
+    bSinalVendaPendente := false;
+  end;
+
+  // Limpa sinais pendentes se não confirmados
+  if not bSinalCompraPendente[1] then bSinalCompraPendente := false;
+  if not bSinalVendaPendente[1] then bSinalVendaPendente := false;
+
+  // gerenciamento
+  if IsBought then
+  begin
+    // Stop Dinâmico: Usa o menor entre o técnico (Mínima anterior) e o ATR
+    fPrecoStop := Lowest(Low, 2)[1];
+    if (Low <= fPrecoStop) or (Low <= BuyPrice - MaximoStopPontos) then ClosePosition;
+    
+    if High >= Close + (AvgTrueRange(7,0) * ATRMultiplicador) then ClosePosition;
+  end;
+
+  if Time() >= HoraFechamento then ClosePosition;
+end

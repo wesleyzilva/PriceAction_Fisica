@@ -1,0 +1,94 @@
+{
+  Robo: ROB_ATR7_VWAP_FORCA_REV
+  Descricao: ATR(7) x VWAP; reversao com peso de volume; entradas apenas se Forca >= ForcaMinimaEntrada
+  Versao: 1.0
+}
+
+input
+  VolumeMinimo(2000);
+  PeriodoMediaVolume(20);
+  MultVolumeReversao(2.0);
+  ForcaMinimaEntrada(60);
+  ForcaMinimaReversao(30);
+  HoraFechamento(170000);
+  ATRMultiplicador(2.0);
+
+var
+  fCorpo, fRange, fVolMedia, fMassa, fAceleracao, fForca : float;
+  bRejeicao, bReversaoConfirmada, bRompCompra, bRompVenda : boolean;
+
+begin
+  fCorpo := Close - Open;
+  fRange := High - Low;
+  if fRange <= 0 then fRange := 0.0001;
+
+  fVolMedia := Media(PeriodoMediaVolume, Volume);
+  if fVolMedia <= 0 then fVolMedia := 1;
+
+  fMassa := fCorpo / fRange;
+  fAceleracao := Volume / fVolMedia;
+  fForca := fMassa * fAceleracao * 100;
+  if fForca > 100 then fForca := 100;
+  if fForca < -100 then fForca := -100;
+
+  bRejeicao := (High > High[1]) and (Low < Low[1]);
+  bReversaoConfirmada := false;
+  if bRejeicao then
+  begin
+    if (Volume >= VolumeMinimo) and (Volume >= fVolMedia * MultVolumeReversao) then
+      bReversaoConfirmada := true;
+  end;
+
+  if bReversaoConfirmada then
+    PaintBar(RGB(255,140,0))
+  else
+  begin
+    // Degradê detalhado: vermelho forte (-100) até verde forte (+100), branco no neutro
+    if fForca >= 95 then PaintBar(RGB(0,100,0));           // Verde muito escuro
+    if (fForca < 95) and (fForca >= 85) then PaintBar(RGB(0,150,0));      // Verde escuro
+    if (fForca < 85) and (fForca >= 75) then PaintBar(RGB(0,200,0));      // Verde
+    if (fForca < 75) and (fForca >= 65) then PaintBar(RGB(34,177,76));    // Verde médio escuro
+    if (fForca < 65) and (fForca >= 55) then PaintBar(RGB(80,200,120));   // Verde médio
+    if (fForca < 55) and (fForca >= 45) then PaintBar(RGB(120,255,170));  // Verde claro
+    if (fForca < 45) and (fForca >= 35) then PaintBar(RGB(153,255,204));  // Verde água
+    if (fForca < 35) and (fForca >= 25) then PaintBar(RGB(180,255,210));  // Verde muito claro
+    if (fForca < 25) and (fForca >= 15) then PaintBar(RGB(200,255,220));  // Verde pálido
+    if (fForca < 15) and (fForca >= 8) then PaintBar(RGB(220,255,240));   // Verde quase branco
+    if (fForca < 8) and (fForca >= 3) then PaintBar(RGB(240,255,250));    // Verde-neutro
+    if (fForca < 3) and (fForca > -3) then PaintBar(RGB(255,255,255));    // Neutro (branco)
+    if (fForca <= -3) and (fForca > -8) then PaintBar(RGB(255,245,245));   // Vermelho-neutro
+    if (fForca <= -8) and (fForca > -15) then PaintBar(RGB(255,230,230));  // Vermelho quase branco
+    if (fForca <= -15) and (fForca > -25) then PaintBar(RGB(255,210,210));  // Vermelho pálido
+    if (fForca <= -25) and (fForca > -35) then PaintBar(RGB(255,180,180));  // Vermelho muito claro
+    if (fForca <= -35) and (fForca > -45) then PaintBar(RGB(255,140,140));  // Vermelho claro
+    if (fForca <= -45) and (fForca > -55) then PaintBar(RGB(255,100,100));  // Vermelho médio
+    if (fForca <= -55) and (fForca > -65) then PaintBar(RGB(255,60,60));    // Vermelho médio escuro
+    if (fForca <= -65) and (fForca > -75) then PaintBar(RGB(220,0,0));      // Vermelho escuro
+    if (fForca <= -75) and (fForca > -85) then PaintBar(RGB(180,0,0));      // Vermelho mais escuro
+    if (fForca <= -85) and (fForca > -95) then PaintBar(RGB(140,0,0));      // Vermelho muito escuro
+    if fForca <= -95 then PaintBar(RGB(100,0,0));                           // Vermelho extremo
+  end;
+
+  // VWAP usado como referência de preço/volume; sinais exigem força mínima
+  bRompCompra := (Close > High[1]) and (Volume > VolumeMinimo) and (fForca >= ForcaMinimaEntrada);
+  bRompVenda  := (Close < Low[1])  and (Volume > VolumeMinimo) and (fForca <= -ForcaMinimaEntrada);
+
+  if bReversaoConfirmada then
+  begin
+    if (Close > High[1]) and (fForca >= ForcaMinimaEntrada) and (not IsBought) then BuyAtMarket;
+    if (Close < Low[1]) and (fForca <= -ForcaMinimaEntrada) and (not IsBought) then SellShortAtMarket;
+  end
+  else
+  begin
+    if bRompCompra and (not IsBought) then BuyAtMarket;
+    if bRompVenda  and (not IsBought) then SellShortAtMarket;
+  end;
+
+  if IsBought then
+  begin
+    if Low <= Close - (AvgTrueRange(7,0) * 1.5) then ClosePosition;
+    if High >= Close + (AvgTrueRange(7,0) * ATRMultiplicador) then ClosePosition;
+  end;
+
+  if Time() >= HoraFechamento then ClosePosition;
+end
