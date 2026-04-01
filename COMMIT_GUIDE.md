@@ -72,11 +72,30 @@ chore: Organizar estrutura do projeto
 - [alterações realizadas]
 ```
 
+## Timestamp no Commit
+
+Todo commit deve incluir a hora no final da mensagem para facilitar rastreamento no log:
+
+```bash
+git commit -m "Descrição da mudança [$(date +%d/%m\ %H:%M)]"
+```
+
+Resultado no log:
+```
+a041c67  feat(robo): novo esquema de cores [01/04 14:32]
+```
+
+> Funciona no bash do Git for Windows (MINGW64).
+
+---
+
 ## Como Claude Gerará Mensagens
 
 1. Analisa os arquivos alterados
-2. Identifica o tipo primário (feat, docs, chore, etc)3. Cria mensagem descritiva seguindo o padrão
-4. Inclui contexto relevante no corpo
+2. Identifica o tipo primário (feat, docs, chore, etc)
+3. Cria mensagem descritiva seguindo o padrão
+4. Inclui timestamp `[DD/MM HH:MM]` no final
+5. Inclui contexto relevante no corpo
 
 ## Configuração
 
