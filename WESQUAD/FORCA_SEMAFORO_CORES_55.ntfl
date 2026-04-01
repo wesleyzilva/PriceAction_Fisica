@@ -31,20 +31,41 @@ begin
   if fForca > 100 then fForca := 100;
   if fForca < -100 then fForca := -100;
 
-  // --- LÓGICA DE CORES (O QUE VOCÊ VAI VER NAS TELAS) ---
-  // Só pinta se a força for maior ou igual a 55%
-  if (fForca >= ForcaMinimaEntrada) entao
+  // --- LÓGICA DE CORES (DEGRADE RGB) ---
+  // Todo candle começa cinza
+  var r, g, b: integer;
+  r := 128; g := 128; b := 128; // Cinza padrão
+
+  // Indecisão: corpo pequeno (ex: < 10% do range)
+  if (abs(fCorpo) < 0.1 * fRange) then
   begin
-    PaintBar(clVerde); // Pintar o candle de Verde (Compra Forte)
+    r := 255; g := 255; b := 255; // Branco
   end
-  senao se (fForca <= -ForcaMinimaEntrada) entao
+  // Compra: força positiva
+  else if (fForca >= ForcaMinimaEntrada) then
   begin
-    PaintBar(clVermelho); // Pintar o candle de Vermelho (Venda Forte)
+    // Verde degradê: quanto maior a força, mais forte o verde
+    g := 128 + round((fForca/100) * 127); // 128 a 255
+    r := 128 - round((fForca/100) * 128); // 128 a 0
+    b := 128 - round((fForca/100) * 128); // 128 a 0
+    if g > 255 then g := 255;
+    if r < 0 then r := 0;
+    if b < 0 then b := 0;
   end
-  senao
+  // Venda: força negativa
+  else if (fForca <= -ForcaMinimaEntrada) then
   begin
-    PaintBar(clCinza); // Pintar de Cinza se a força for fraca (abaixo de 55%)
-  end;
+    // Vermelho degradê: quanto menor a força, mais forte o vermelho
+    r := 128 + round((-fForca/100) * 127); // 128 a 255
+    g := 128 - round((-fForca/100) * 128); // 128 a 0
+    b := 128 - round((-fForca/100) * 128); // 128 a 0
+    if r > 255 then r := 255;
+    if g < 0 then g := 0;
+    if b < 0 then b := 0;
+  end
+  // Senão, permanece cinza
+
+  PaintBar(RGB(r, g, b));
 
   // --- SINAIS PARA O GERENCIADOR DE ALARMES ---
   // Usamos as funções de sinal para o Profit "gritar" no som
